@@ -31,15 +31,7 @@ Built for the [H0: Hack the Zero Stack](https://h01.devpost.com) hackathon with 
 
 ---
 
-## Screenshots
 
-> Roadmap view with card grid and progress tracking
-
-> Architecture simulator with React Flow graph
-
-> AI News feed with signal/hype filtering
-
----
 
 ## Tech Stack
 
@@ -141,7 +133,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────┐
 │                   Next.js Frontend                   │
 │         (Vercel v0 scaffolded, App Router)           │
 ├──────────────┬──────────────┬────────────────────────┤
