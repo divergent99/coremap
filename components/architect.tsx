@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Cpu, ExternalLink } from 'lucide-react'
 import {
   ReactFlow,
@@ -184,6 +184,20 @@ export function Architect() {
   const [architecture, setArchitecture] = useState<Architecture | null>(null)
   const [error, setError] = useState('')
 
+  // Restore saved architecture on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('coremap-architecture')
+      const savedPrompt = localStorage.getItem('coremap-arch-prompt')
+      if (saved) {
+        setArchitecture(JSON.parse(saved))
+        if (savedPrompt) setPrompt(savedPrompt)
+      }
+    } catch {
+      localStorage.removeItem('coremap-architecture')
+    }
+  }, [])
+
   async function handleGenerate() {
     if (!prompt.trim() || loading) return
     setLoading(true)
@@ -197,11 +211,20 @@ export function Architect() {
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setArchitecture(data)
+      localStorage.setItem('coremap-architecture', JSON.stringify(data))
+      localStorage.setItem('coremap-arch-prompt', prompt)
     } catch {
       setError('Something went wrong. Try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleReset() {
+    setArchitecture(null)
+    setPrompt('')
+    localStorage.removeItem('coremap-architecture')
+    localStorage.removeItem('coremap-arch-prompt')
   }
 
   if (loading) {
@@ -294,7 +317,7 @@ export function Architect() {
         )}
 
         <div className="flex justify-center">
-          <button onClick={() => { setArchitecture(null); setPrompt('') }}
+          <button onClick={handleReset}
             className="text-sm text-white/40 hover:text-white transition-colors">
             Design another architecture
           </button>
