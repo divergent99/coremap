@@ -330,11 +330,12 @@ function RoadmapView({
   const [done, setDone] = useState<Set<string>>(new Set())
   const [viewMode, setViewMode] = useState<'grid' | 'graph'>('grid')
   const [selectedStep, setSelectedStep] = useState<RoadmapStep | null>(null)
+  const [progressLoaded, setProgressLoaded] = useState(false)
 
-  // Load saved progress on mount
   useEffect(() => {
     loadProgress().then((ids) => {
       if (ids.length > 0) setDone(new Set(ids))
+      setProgressLoaded(true)
     })
   }, [])
 
@@ -415,7 +416,16 @@ function RoadmapView({
         </button>
       </div>
 
-      {viewMode === 'graph' ? (
+      {!progressLoaded ? (
+        <div className="flex justify-center py-10">
+          <div className="flex gap-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="size-2 rounded-full bg-white/30 animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }} />
+            ))}
+          </div>
+        </div>
+      ) : viewMode === 'graph' ? (
         <div className="mb-8">
           <RoadmapGraph steps={roadmap.steps} done={done} onNodeClick={handleNodeClick} />
         </div>
