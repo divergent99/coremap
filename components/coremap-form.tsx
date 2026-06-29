@@ -493,7 +493,6 @@ export function CoremapForm() {
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null)
   const [error, setError] = useState('')
 
-  // Restore saved roadmap on mount
   useEffect(() => {
     const saved = localStorage.getItem('coremap-roadmap')
     const savedBackground = localStorage.getItem('coremap-background')
@@ -514,12 +513,26 @@ export function CoremapForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!canSubmit) return
+
+    // Return cached roadmap if same combo
+    const savedBackground = localStorage.getItem('coremap-background')
+    const savedGoal = localStorage.getItem('coremap-goal')
+    const savedRoadmap = localStorage.getItem('coremap-roadmap')
+
+    if (savedRoadmap && savedBackground === background && savedGoal === goal) {
+      try {
+        setRoadmap(JSON.parse(savedRoadmap))
+        return
+      } catch {
+        localStorage.removeItem('coremap-roadmap')
+      }
+    }
+
     setLoading(true)
     setError('')
     try {
       const result = await generateRoadmap(background as Background, goal as Goal)
       setRoadmap(result)
-      // Save to localStorage
       localStorage.setItem('coremap-roadmap', JSON.stringify(result))
       localStorage.setItem('coremap-background', background)
       localStorage.setItem('coremap-goal', goal)
@@ -542,9 +555,6 @@ export function CoremapForm() {
           setRoadmap(null)
           setBackground('')
           setGoal('')
-          localStorage.removeItem('coremap-roadmap')
-          localStorage.removeItem('coremap-background')
-          localStorage.removeItem('coremap-goal')
         }}
       />
     )
