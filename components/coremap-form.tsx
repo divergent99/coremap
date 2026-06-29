@@ -140,7 +140,7 @@ function LoadingState() {
       </div>
       <div className="flex flex-col gap-1">
         <p className="text-sm font-medium text-white">{steps[currentStep]}</p>
-        <p className="text-xs text-white/40">This takes about 30 seconds</p>
+        <p className="text-xs text-white/40">This takes about 60 seconds</p>
       </div>
     </div>
   )
