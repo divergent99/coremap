@@ -464,36 +464,42 @@ export function CoremapForm() {
   const canSubmit = background !== '' && goal !== '' && !loading
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!canSubmit) return
+  e.preventDefault()
+  if (!canSubmit) return
 
-    const savedBackground = localStorage.getItem('coremap-background')
-    const savedGoal = localStorage.getItem('coremap-goal')
-    const savedRoadmap = localStorage.getItem('coremap-roadmap')
+  const savedBackground = localStorage.getItem('coremap-background')
+  const savedGoal = localStorage.getItem('coremap-goal')
+  const savedRoadmap = localStorage.getItem('coremap-roadmap')
 
-    if (savedRoadmap && savedBackground === background && savedGoal === goal) {
-      try {
-        setRoadmap(JSON.parse(savedRoadmap))
-        return
-      } catch {
-        localStorage.removeItem('coremap-roadmap')
-      }
-    }
-
-    setLoading(true)
-    setError('')
+  // Same combo -- load from cache
+  if (savedRoadmap && savedBackground === background && savedGoal === goal) {
     try {
-      const result = await generateRoadmap(background as Background, goal as Goal)
-      setRoadmap(result)
-      localStorage.setItem('coremap-roadmap', JSON.stringify(result))
-      localStorage.setItem('coremap-background', background)
-      localStorage.setItem('coremap-goal', goal)
+      setRoadmap(JSON.parse(savedRoadmap))
+      return
     } catch {
-      setError('Something went wrong. Try again.')
-    } finally {
-      setLoading(false)
+      localStorage.removeItem('coremap-roadmap')
     }
   }
+
+  // Different combo -- clear old cache before generating
+  localStorage.removeItem('coremap-roadmap')
+  localStorage.removeItem('coremap-background')
+  localStorage.removeItem('coremap-goal')
+
+  setLoading(true)
+  setError('')
+  try {
+    const result = await generateRoadmap(background as Background, goal as Goal)
+    setRoadmap(result)
+    localStorage.setItem('coremap-roadmap', JSON.stringify(result))
+    localStorage.setItem('coremap-background', background)
+    localStorage.setItem('coremap-goal', goal)
+  } catch {
+    setError('Something went wrong. Try again.')
+  } finally {
+    setLoading(false)
+  }
+}
 
   async function handleRegenerate() {
     setRoadmap(null)
